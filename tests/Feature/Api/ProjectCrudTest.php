@@ -30,6 +30,6 @@ class ProjectCrudTest extends ApiTestCase
         $this->actingAsApiUser($user)->deleteJson('/api/projects/'.$projectId)
             ->assertOk();
 
-        $this->assertDatabaseMissing('projects', ['id' => $projectId]);
+        $this->assertSoftDeleted('projects', ['id' => $projectId]);
     }
 }

@@ -33,4 +33,16 @@ class OrganizationFactory extends Factory
             ]);
         });
     }
+
+    public function team(): static
+    {
+        return $this->afterCreating(function (Organization $organization): void {
+            $organization->subscriptions()->create([
+                'type' => 'default',
+                'stripe_id' => 'sub_'.fake()->unique()->uuid(),
+                'stripe_status' => 'active',
+                'stripe_price' => config('cashier.team_price_id', 'price_test_team'),
+            ]);
+        });
+    }
 }

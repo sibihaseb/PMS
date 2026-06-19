@@ -12,10 +12,11 @@ Route::post('/login', [AuthController::class, 'login']);
 
 Route::post('/stripe/webhook', [WebhookController::class, 'handleWebhook']);
 
-Route::middleware(['auth:sanctum', 'organization'])->group(function () {
+Route::middleware(['auth:sanctum', 'organization', 'organization.throttle'])->group(function () {
     Route::post('/logout', [AuthController::class, 'logout']);
     Route::get('/me', [AuthController::class, 'me']);
 
+    Route::post('/projects/{id}/restore', [ProjectController::class, 'restore']);
     Route::apiResource('projects', ProjectController::class);
 
     Route::get('/projects/{project}/tasks', [TaskController::class, 'index']);
