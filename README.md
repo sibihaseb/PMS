@@ -45,19 +45,34 @@ STRIPE_KEY=pk_test_...
 STRIPE_SECRET=sk_test_...
 STRIPE_WEBHOOK_SECRET=whsec_...
 STRIPE_PRO_PRICE_ID=price_...
+STRIPE_TEAM_PRICE_ID=price_...
 CASHIER_CURRENCY=usd
 ```
 
-3. Create a recurring **Pro** product/price in Stripe test mode and copy the Price ID to `STRIPE_PRO_PRICE_ID`.
+3. Create recurring **Pro** and **Team** products/prices in Stripe test mode.
 4. Forward webhooks locally:
 
 ```bash
 stripe listen --forward-to localhost:8000/api/stripe/webhook
 ```
 
-5. Use `POST /api/billing/checkout` (as org owner) to get a Checkout URL.
+5. Use `POST /api/billing/checkout` with `{ "plan": "pro" }` or `{ "plan": "team" }` (org owner only).
 
 Billing is attached to the **Organization**, not individual users. Project limits apply org-wide.
+
+## Plans
+
+| Plan | Project limit |
+|------|---------------|
+| Free | 3 |
+| Team | 20 |
+| Pro | Unlimited |
+
+## Phase 2 features
+
+- **Team plan** — 20 projects via Stripe Team price
+- **Soft deletes** — `DELETE /api/projects/{id}` soft-deletes; `POST /api/projects/{id}/restore` restores; deleted projects do not count toward limits
+- **Rate limiting** — 60 requests/min per organization on protected API routes (HTTP 429)
 
 ## API documentation
 
@@ -69,8 +84,8 @@ See [DEPLOYMENT.md](DEPLOYMENT.md).
 
 ## Done / Not done / Next
 
-**Done:** Auth, multi-tenant projects CRUD, Free plan 402 enforcement, Stripe billing (checkout + webhook + status), tasks (create/list), seeders, feature tests, CI.
+**Done:** Phase 1 (auth, tenancy, projects CRUD, Free/Pro billing, tasks, CI, docs) and Phase 2 (Team plan, soft deletes + restore, per-org rate limiting).
 
-**Not done:** Live production deploy (optional bonus), Phase 2 change request (Team plan, soft deletes, rate limiting).
+**Not done:** Live production deploy (optional bonus).
 
-**Next:** Phase 2 on a separate branch — Team plan (20 projects), soft-deleted projects excluded from usage, per-org rate limiting (60 req/min).
+**Next:** Optional production deploy; Stripe live-mode hardening if shipping beyond test mode.

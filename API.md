@@ -154,11 +154,34 @@ All project routes require auth + organization membership.
 
 `DELETE /api/projects/{id}`
 
+Soft-deletes the project. Soft-deleted projects do not count toward plan usage limits.
+
 **200 Response:**
 
 ```json
 {
   "message": "Project deleted successfully."
+}
+```
+
+### Restore project
+
+`POST /api/projects/{id}/restore`
+
+Restores a soft-deleted project within the current organization.
+
+**200 Response:**
+
+```json
+{
+  "data": {
+    "id": 1,
+    "organization_id": 1,
+    "name": "Website Redesign",
+    "description": null,
+    "created_at": "...",
+    "updated_at": "..."
+  }
 }
 ```
 
@@ -221,9 +244,19 @@ Billing is scoped to the **organization**. Any org member can read status; only 
 
 For Pro: `"plan": "pro"`, `"projects_limit": null`.
 
-### Checkout (upgrade to Pro)
+For Team: `"plan": "team"`, `"projects_limit": 20`.
+
+### Checkout (subscribe to Pro or Team)
 
 `POST /api/billing/checkout` — owner only.
+
+```json
+{
+  "plan": "pro"
+}
+```
+
+Use `"plan": "team"` for the Team plan (20 projects).
 
 **200 Response:**
 
@@ -255,5 +288,7 @@ For Pro: `"plan": "pro"`, `"projects_limit": null`.
 ## Authorization errors
 
 **403 Response** when user has no organization or lacks permission (e.g. member attempting checkout).
+
+**429 Response** when the organization exceeds 60 API requests per minute on protected routes.
 
 **401 Response** when token is missing or invalid.

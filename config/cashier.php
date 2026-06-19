@@ -135,4 +135,6 @@ return [
 
     'pro_price_id' => env('STRIPE_PRO_PRICE_ID'),
 
+    'team_price_id' => env('STRIPE_TEAM_PRICE_ID'),
+
 ];

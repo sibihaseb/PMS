@@ -8,6 +8,7 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Laravel\Cashier\Billable;
+use Laravel\Cashier\Subscription;
 
 class Organization extends Model
 {
@@ -39,11 +40,18 @@ class Organization extends Model
 
     public function currentPlan(): Plan
     {
-        if ($this->subscribed('default')) {
-            return Plan::Pro;
+        /** @var Subscription|null $subscription */
+        $subscription = $this->subscription('default');
+
+        if ($subscription === null || ! $subscription->active()) {
+            return Plan::Free;
         }
 
-        return Plan::Free;
+        if ($subscription->stripe_price === config('cashier.team_price_id')) {
+            return Plan::Team;
+        }
+
+        return Plan::Pro;
     }
 
     public function projectsCount(): int

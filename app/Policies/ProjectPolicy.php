@@ -31,4 +31,9 @@ class ProjectPolicy
     {
         return $user->organization_id === $project->organization_id;
     }
+
+    public function restore(User $user, Project $project): bool
+    {
+        return $user->organization_id === $project->organization_id;
+    }
 }
