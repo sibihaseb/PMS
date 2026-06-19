@@ -2,7 +2,6 @@
 
 namespace App\Services;
 
-use App\Enums\Plan;
 use App\Exceptions\ProjectLimitExceededException;
 use App\Models\Organization;
 
@@ -35,7 +34,7 @@ class ProjectLimitService
         return [
             'plan' => $plan->value,
             'projects_used' => $this->usageFor($organization),
-            'projects_limit' => $plan === Plan::Pro ? null : $this->limitFor($organization),
+            'projects_limit' => $plan->projectLimit(),
         ];
     }
 }

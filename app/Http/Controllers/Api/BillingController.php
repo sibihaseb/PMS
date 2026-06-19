@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
+use App\Http\Requests\Api\CheckoutRequest;
 use App\Models\Organization;
 use App\Services\ProjectLimitService;
 use Illuminate\Http\JsonResponse;
@@ -20,7 +21,7 @@ class BillingController extends Controller
         return response()->json($this->projectLimitService->statusFor($organization));
     }
 
-    public function checkout(Request $request): JsonResponse
+    public function checkout(CheckoutRequest $request): JsonResponse
     {
         /** @var Organization $organization */
         $organization = $request->user()->organization;
@@ -29,15 +30,15 @@ class BillingController extends Controller
 
         if ($organization->subscribed('default')) {
             return response()->json([
-                'message' => 'Organization already has an active Pro subscription.',
+                'message' => 'Organization already has an active subscription.',
             ], 422);
         }
 
-        $priceId = config('cashier.pro_price_id');
+        $priceId = $request->priceId();
 
         if (empty($priceId)) {
             return response()->json([
-                'message' => 'Stripe Pro price ID is not configured.',
+                'message' => 'Stripe price ID is not configured for the selected plan.',
             ], 500);
         }
 
